@@ -5,7 +5,7 @@
 clear;
 clc;
 for j = 1:5
-Dataset = 'BlogCatalog';
+Dataset = 'Flickr';
 if strcmp(Dataset,'BlogCatalog')
     load('BlogCatalog.mat')
     alpha1 = 43; % the weight for node attribute information
@@ -45,7 +45,7 @@ end
 Y=Y*1;
 
 Indices = randi(20,n,1); % 5-fold cross-validation indices
-Group1 = find(Indices <= 16); % 1 for 1/16, 2 for 1/8, 4 for 1/4, 16 for 100% of training group
+Group1 = find(Indices <= 1); % 1 for 1/16, 2 for 1/8, 4 for 1/4, 16 for 100% of training group
 Group2 = find(Indices >= 17); % test group, test each fold in turns
 %% Training group
 G1 = sparse(G(Group1,Group1)); % network of nodes in the training group
@@ -60,43 +60,43 @@ GC2 = sparse(G(Group2,:)); % For constructing test representation H2
 
 methods = {'Lap','CN', 'AA', 'RA', 'HDI','HPI','Salton','RWR'};
 for i =1:length(methods)
-%     disp('Label informed Attributed Network Embedding (LANE), 5-fold with 100% of training is used:')
-    H1 = LANE_fun(methods{i},G1,A1,Y1,d,alpha1,alpha2,numiter); % representation of training group
-    H2 = delta1*(GC2*pinv(pinv(H1)*GC1))+delta2*(A2*pinv(pinv(H1)*A1)); % representation of test group
-    [F1macro1,F1micro1] = Performance(H1,H2,Label(Group1,:),Label(Group2,:));%
-% 
-% 
-%     fprintf('MacroF1 %.3f MicroF1 %.3f\n', F1macro1, F1micro1);
-
-%     %% Unsupervised Attributed Network Embedding (LANE w/o Label)
-%     %disp('Unsupervised Attributed Network Embedding (LANE w/o Label):')
-%     if strcmp(Dataset,'BlogCatalog')
-%         % Parameters of BlogCatalog in Unsupervised
-%         beta1 = 8; % the weight for node attribute information
-%         beta2 = 0.1; % the weight for the correlations
-%         numiter = 3; % the max number of iteration
-%         delta1 = 1.4; % weight of network information for constructing test representation H2
-%         delta2 = 1; % weight of node attribute information for constructing test representation H2
-%     elseif strcmp(Dataset,'Flickr')
-%         % Parameters of BlogCatalog in Unsupervised
-%         beta1 = 0.51; % the weight for node attribute information
-%         beta2 = 0.1; % the weight for the correlations
-%         numiter = 2; % the max number of iteration
-%         delta1 = 0.55; % weight of network information for constructing test representation H2
-%         delta2 = 2.1; % weight of node attribute information for constructing test representation H2
-%     elseif strcmp(Dataset,'Cora')
-%         % Parameters of BlogCatalog in Unsupervised
-%         beta1 = 0.51; % the weight for node attribute information
-%         beta2 = 0.1; % the weight for the correlations
-%         numiter = 2; % the max number of iteration
-%         delta1 = 0.55; % weight of network information for constructing test representation H2
-%         delta2 = 2.1; % weight of node attribute information for constructing test representation H2
-%     end
-% 
-%     H1 = LANE_fun(methods{i},G1,A1,d,beta1,beta2,numiter); % representation of training group
+% %     disp('Label informed Attributed Network Embedding (LANE), 5-fold with 100% of training is used:')
+%     H1 = LANE_fun(methods{i},G1,A1,Y1,d,alpha1,alpha2,numiter); % representation of training group
 %     H2 = delta1*(GC2*pinv(pinv(H1)*GC1))+delta2*(A2*pinv(pinv(H1)*A1)); % representation of test group
-%     [F1macro2,F1micro2] = Performance(H1,H2,Label(Group1,:),Label(Group2,:)); %
-    fprintf('%s MacroF1 %.3f MicroF1 %.3f\n', methods{i}, F1macro1, F1micro1);
+%     [F1macro1,F1micro1] = Performance(H1,H2,Label(Group1,:),Label(Group2,:));%
+% % 
+% % 
+% %     fprintf('MacroF1 %.3f MicroF1 %.3f\n', F1macro1, F1micro1);
+
+    %% Unsupervised Attributed Network Embedding (LANE w/o Label)
+    %disp('Unsupervised Attributed Network Embedding (LANE w/o Label):')
+    if strcmp(Dataset,'BlogCatalog')
+        % Parameters of BlogCatalog in Unsupervised
+        beta1 = 8; % the weight for node attribute information
+        beta2 = 0.1; % the weight for the correlations
+        numiter = 3; % the max number of iteration
+        delta1 = 1.4; % weight of network information for constructing test representation H2
+        delta2 = 1; % weight of node attribute information for constructing test representation H2
+    elseif strcmp(Dataset,'Flickr')
+        % Parameters of BlogCatalog in Unsupervised
+        beta1 = 0.51; % the weight for node attribute information
+        beta2 = 0.1; % the weight for the correlations
+        numiter = 2; % the max number of iteration
+        delta1 = 0.55; % weight of network information for constructing test representation H2
+        delta2 = 2.1; % weight of node attribute information for constructing test representation H2
+    elseif strcmp(Dataset,'Cora')
+        % Parameters of BlogCatalog in Unsupervised
+        beta1 = 0.51; % the weight for node attribute information
+        beta2 = 0.1; % the weight for the correlations
+        numiter = 2; % the max number of iteration
+        delta1 = 0.55; % weight of network information for constructing test representation H2
+        delta2 = 2.1; % weight of node attribute information for constructing test representation H2
+    end
+
+    H1 = LANE_fun(methods{i},G1,A1,d,beta1,beta2,numiter); % representation of training group
+    H2 = delta1*(GC2*pinv(pinv(H1)*GC1))+delta2*(A2*pinv(pinv(H1)*A1)); % representation of test group
+    [F1macro2,F1micro2] = Performance(H1,H2,Label(Group1,:),Label(Group2,:)); %
+    fprintf('%s MacroF1 %.3f MicroF1 %.3f\n', methods{i}, F1macro2, F1micro2);
 
     %fprintf('-----------------------------------------------------------------\n')
 end
